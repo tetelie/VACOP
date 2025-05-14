@@ -11,7 +11,7 @@ def pdo_handler(pdo):
 network = canopen.Network()
 network.connect(channel='can0',bustype='socketcan')
 
-node = canopen.RemoteNode(4,'/home/vacop/Desktop/can-open-rsp/ODs/Slave_STM32/Slave_STM32.eds')
+node = canopen.RemoteNode(1,'/home/vacop/Desktop/can-open-rsp/ODs/Slave_STM32/Slave_STM32.eds')
 print("Affichage Node",node)
 network.add_node(node)
 node.nmt.state = 'PRE-OPERATIONAL'
@@ -29,7 +29,7 @@ print("Lecture TPDO ")
 
 rpdo = node.rpdo[1]
 rpdo.clear()
-# ~ node.rpdo.read()
+node.rpdo.read()
 rpdo.add_variable(0x2110,0x01)
 rpdo.cob_id = 0x180
 rpdo.enabled= True
