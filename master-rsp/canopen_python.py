@@ -2,7 +2,7 @@ import canopen
 
 def pdo_handler(pdo):
 	try :
-		val = node.rpdo[1]['objet_test'].raw
+		val = node.rpdo[1]['Object_test'].raw
 		print("PDO reçu", val)
 	except Exception as e :
 		print( "Erreur ", e)
@@ -29,7 +29,7 @@ print("Lecture TPDO ")
 
 rpdo = node.rpdo[1]
 rpdo.clear()
-# node.rpdo.read()
+node.rpdo.read()
 rpdo.add_variable(0x2110,0x01)
 rpdo.cob_id = 0x182
 rpdo.enabled= True
