@@ -165,7 +165,7 @@ void CO_CANmodule_disable(CO_CANmodule_t* CANmodule) {
 }
 
 /******************************************************************************/
-CO_ReturnError_t CO_CANrxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index, uint16_t ident, uint16_t mask, bool_t rtr, void *object,
+CO_ReturnError_t   CO_CANrxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index, uint16_t ident, uint16_t mask, bool_t rtr, void *object,
                                     void (*CANrx_callback)(void *object, void *message)) {
 
   ////log_printf("CO_CANrxBufferInit\n");

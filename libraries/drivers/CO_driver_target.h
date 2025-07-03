@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-/* Stack configuration override default values. */
+/* 
 #define CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE CO_CONFIG_FLAG_CALLBACK_PRE
 #define CO_CONFIG_GLOBAL_FLAG_TIMERNEXT CO_CONFIG_FLAG_TIMERNEXT
 
@@ -41,13 +41,17 @@ extern "C" {
 #undef CO_CONFIG_LEDS
 #define CO_CONFIG_LEDS (CO_CONFIG_LEDS_ENABLE | CO_CONFIG_FLAG_TIMERNEXT)
 
+*/
+
 #undef CO_CONFIG_STORAGE
 #define CO_CONFIG_STORAGE 0x00
+
 
 #define CO_LITTLE_ENDIAN
 #define CO_SWAP_16(x) x
 #define CO_SWAP_32(x) x
 #define CO_SWAP_64(x) x
+
 
 typedef uint_fast8_t bool_t;
 typedef float float32_t;
