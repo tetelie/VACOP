@@ -35,7 +35,7 @@ volatile bool canopen_1ms_tick = false;
 */
 void debug(bool ln = true) {
   if (DEBUG) {
-    if (ln) Serial.println();
+    if (ln) //Serial.println();
   }
 }
 
@@ -44,9 +44,9 @@ template<typename T>
 typename std::enable_if<std::is_integral<T>::value, void>::type
 debug(T message, int format, bool ln = true) {
   if (ln) {
-    Serial.println(message, format);
+    //Serial.println(message, format);
   } else {
-    Serial.print(message, format);
+    //Serial.print(message, format);
   }
 }
 
@@ -54,9 +54,9 @@ debug(T message, int format, bool ln = true) {
 template<typename T>
 void debug(T message, bool ln = true) {
   if (ln) {
-    Serial.println(message);
+    //Serial.println(message);
   } else {
-    Serial.print(message);
+    //Serial.print(message);
   }
 }
 
@@ -222,7 +222,7 @@ void loop() {
   static uint32_t lastProcessTime = 0;
 
   int value = analogRead(PA0);
-  //Serial.println(value);
+  ////Serial.println(value);
 
   if (canopen_1ms_tick) { // ce flag est mis à vrai à chaque iteration du timer hardware
     canopen_1ms_tick = false; // on met le flag directement à faux

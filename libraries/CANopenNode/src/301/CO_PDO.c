@@ -473,7 +473,7 @@ static void CO_PDO_receive(void *object, void *msg) {
     uint8_t *data = CO_CANrxMsg_readData(msg);
     uint8_t err = RPDO->receiveError;
 
-    log_printf("J4AI RECU UN PDO \n");
+    //log_printf("J4AI RECU UN PDO \n");
 
     if (PDO->valid) {
         if (DLC >= PDO->dataLength) {
@@ -700,19 +700,17 @@ CO_ReturnError_t CO_RPDO_init(CO_RPDO_t *RPDO,
         CAN_ID = 0;
     }
 
-    log_printf("est-ce qu'il arrive ici au moins, test test test test test test test \n");
-    
+    //log_printf("est-ce qu'il arrive ici au moins, test test test test test test test \n");
+
     /* If default CAN-ID is stored in OD (without Node-ID), add Node-ID */
     if (CAN_ID != 0 && CAN_ID == (preDefinedCanId & 0xFF80)) {
         CAN_ID = preDefinedCanId;
-        log_printf("il rentre le preDefinedCANid \n");
+        //log_printf("il rentre le preDefinedCANid \n");
     }
 
-    log_printf("mais CAN ID il est égale à %d",CAN_ID);
+    //log_printf("mais CAN ID il est égale à %d",CAN_ID);
 
-    log_printf(" avant CO_PDO_receive \n");
-
-    CAN_ID=0x182;
+    //log_printf(" avant CO_PDO_receive \n");
     ret = CO_CANrxBufferInit(
             CANdevRx,           /* CAN device */
             CANdevRxIdx,        /* rx buffer index */
@@ -725,7 +723,7 @@ CO_ReturnError_t CO_RPDO_init(CO_RPDO_t *RPDO,
         return ret;
     }
 
-    log_printf(" après PDO_receive\n");
+    //log_printf(" après PDO_receive\n");
 
     PDO->valid = valid;
 
@@ -997,7 +995,7 @@ static ODR_t OD_write_18xx(OD_stream_t *stream, const void *buf,
                 CAN_ID = 0;
             }
 
-            
+
 
             CO_CANtx_t *CANtxBuff = CO_CANtxBufferInit(
                 PDO->CANdev,      /* CAN device */
@@ -1172,11 +1170,11 @@ CO_ReturnError_t CO_TPDO_init(CO_TPDO_t *TPDO,
 
     /* If default CAN-ID is stored in OD (without Node-ID), add Node-ID */
     if (CAN_ID != 0 && CAN_ID == (preDefinedCanId & 0xFF80)) {
-        log_printf("il déifni a CAN ID  le preDefinedCanId \n");
+        //log_printf("il déifni a CAN ID  le preDefinedCanId \n");
         CAN_ID = preDefinedCanId;
     }
 
-    log_printf("le CAN ID de la transmission  est  %d \n", CAN_ID);
+    //log_printf("le CAN ID de la transmission  est  %d \n", CAN_ID);
 
     TPDO->CANtxBuff = CO_CANtxBufferInit(
             CANdevTx,           /* CAN device */

@@ -28,35 +28,35 @@ void SendData()  // Send can messages in 50Hz phase from timer interrupt.
   CAN_outMsg_3.buf[6] =  Counter;
   Can.write(CAN_outMsg_3);
 
-  Serial.print("Sent: ");
-  Serial.println(Counter, HEX);
+  //Serial.print("Sent: ");
+  //Serial.println(Counter, HEX);
   Counter++;
 }
  
 void readCanMessage()  // Read data from CAN bus and print out the messages to serial bus. Note that only message ID's that pass filters are read.
 {
-  Serial.print("Channel:");
-  Serial.print(CAN_inMsg.bus);
+  //Serial.print("Channel:");
+  //Serial.print(CAN_inMsg.bus);
   if (CAN_inMsg.flags.extended == false) {
-    Serial.print(" Standard ID:");
+    //Serial.print(" Standard ID:");
   }
   else {
-    Serial.print(" Extended ID:");
+    //Serial.print(" Extended ID:");
   }
-  Serial.print(CAN_inMsg.id, HEX);
+  //Serial.print(CAN_inMsg.id, HEX);
 
-  Serial.print(" DLC: ");
-  Serial.print(CAN_inMsg.len);
+  //Serial.print(" DLC: ");
+  //Serial.print(CAN_inMsg.len);
   if (CAN_inMsg.flags.remote == false) {
-     Serial.print(" buf: ");
+     //Serial.print(" buf: ");
     for(int i=0; i<CAN_inMsg.len; i++) {
-      Serial.print("0x"); 
-      Serial.print(CAN_inMsg.buf[i], HEX); 
-      if (i != (CAN_inMsg.len-1))  Serial.print(" ");
+      //Serial.print("0x"); 
+      //Serial.print(CAN_inMsg.buf[i], HEX); 
+      if (i != (CAN_inMsg.len-1))  //Serial.print(" ");
     }
-    Serial.println();
+    //Serial.println();
   } else {
-     Serial.println(" Data: REMOTE REQUEST FRAME");
+     //Serial.println(" Data: REMOTE REQUEST FRAME");
   }
 }
 

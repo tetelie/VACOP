@@ -119,6 +119,8 @@ uint8_t  CO_CANrxMsg_readDLC(void *msg);
 /* Prototypes */
 void CO_CANinterruptRx(CO_CANmodule_t *CANmodule);
 
+void printRxSize(CO_CANmodule_t* CANmodule, char * message);
+
 #ifdef __cplusplus
 }
 #endif

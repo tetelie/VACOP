@@ -91,8 +91,8 @@ void loop() {
     CAN_TX_msg.buf[7] =  0x00;
 
     Can.write(CAN_TX_msg);
-    Serial.print("Sent: ");
-    Serial.println(Counter, HEX);
+    //Serial.print("Sent: ");
+    //Serial.println(Counter, HEX);
     Counter++;
   }
 }

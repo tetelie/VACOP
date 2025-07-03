@@ -23,28 +23,28 @@ void setup() {
 
 void loop() {
   if (Can.read(CAN_RX_msg) ) {
-    Serial.print("Channel:");
-    Serial.print(CAN_RX_msg.bus);
+    //Serial.print("Channel:");
+    //Serial.print(CAN_RX_msg.bus);
     if (CAN_RX_msg.flags.extended == false) {
-      Serial.print(" Standard ID:");
+      //Serial.print(" Standard ID:");
     }
     else {
-      Serial.print(" Extended ID:");
+      //Serial.print(" Extended ID:");
     }
-    Serial.print(CAN_RX_msg.id, HEX);
+    //Serial.print(CAN_RX_msg.id, HEX);
 
-    Serial.print(" DLC: ");
-    Serial.print(CAN_RX_msg.len);
+    //Serial.print(" DLC: ");
+    //Serial.print(CAN_RX_msg.len);
     if (CAN_RX_msg.flags.remote == false) {
-       Serial.print(" buf: ");
+       //Serial.print(" buf: ");
       for(int i=0; i<CAN_RX_msg.len; i++) {
-        Serial.print("0x"); 
-        Serial.print(CAN_RX_msg.buf[i], HEX); 
-        if (i != (CAN_RX_msg.len-1))  Serial.print(" ");
+        //Serial.print("0x"); 
+        //Serial.print(CAN_RX_msg.buf[i], HEX); 
+        if (i != (CAN_RX_msg.len-1))  //Serial.print(" ");
       }
-      Serial.println();
+      //Serial.println();
     } else {
-       Serial.println(" Data: REMOTE REQUEST FRAME");
+       //Serial.println(" Data: REMOTE REQUEST FRAME");
     }
   }
 }

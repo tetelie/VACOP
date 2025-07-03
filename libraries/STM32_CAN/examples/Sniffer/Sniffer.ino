@@ -15,26 +15,26 @@ void loop() {
   if (Can1.read(CAN_RX_msg)) {
 
     // Timestamp
-    Serial.print(micros());
-    Serial.print(";");
+    //Serial.print(micros());
+    //Serial.print(";");
 
     // ID
-    Serial.print(CAN_RX_msg.id, HEX);
-    Serial.print(";");
+    //Serial.print(CAN_RX_msg.id, HEX);
+    //Serial.print(";");
 
     // Length
-    Serial.print(CAN_RX_msg.len);
-    Serial.print(";");
+    //Serial.print(CAN_RX_msg.len);
+    //Serial.print(";");
 
     // Data
     if (CAN_RX_msg.flags.remote == false) {
       for(int i=0; i<CAN_RX_msg.len; i++) {
-        Serial.print("0x");
-        Serial.print(CAN_RX_msg.buf[i], HEX);
+        //Serial.print("0x");
+        //Serial.print(CAN_RX_msg.buf[i], HEX);
         if (i != (CAN_RX_msg.len-1))
-          Serial.print(";");
+          //Serial.print(";");
       }
-      Serial.println();
+      //Serial.println();
     }
   }
 }

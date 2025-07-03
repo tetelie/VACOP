@@ -1,11 +1,14 @@
 #define CO_MULTIPLE_OD
 
+#define CO_USE_GLOBALS
 #include "CANopen.h"
 
 #include "OD.h"
 
 #include "hal_conf_extra.h"
 #include <STM32_CAN.h>
+
+#include "CO.h"
 
 #define DEBUG 1
 
@@ -15,7 +18,6 @@ CO_NMT_control_t nmt_control = CO_NMT_STARTUP_TO_OPERATIONAL;
 
 
 STM32_CAN Can1(CAN1, DEF);  // Broches PA11/PA12 pour CAN1
-CO_t *CO = NULL;            // Objet CANopen
 
 CAN_message_t latestMsg;
 volatile bool newMessage = false;
@@ -77,9 +79,41 @@ void setup_hardware_timer() {
   timer.attachInterrupt([]() {
     canopen_1ms_tick = true;
     canopen_5000ms_tick++;
-    //Serial.println("tick");
+    ////Serial.println("tick");
   });
   timer.resume();
+}
+
+
+void dumpCO(CO_t *co) {
+ if (co == NULL) {
+   Serial.println("⚠️ CO est NULL !");
+   return;
+ }
+
+ Serial.println("======= DUMP CO =======");
+ Serial.print("Adresse CO : 0x"); Serial.println((uintptr_t)co, HEX);
+ //Serial.print("NodeID : "); Serial.println(co->nodeId);
+ Serial.print("nodeIdUnconfigured : "); Serial.println(co->nodeIdUnconfigured);
+ Serial.print("CANmodule : 0x"); Serial.println((uintptr_t)co->CANmodule, HEX);
+
+ if (co->CANmodule) {
+   Serial.print("  CANptr : 0x"); Serial.println((uintptr_t)co->CANmodule->CANptr, HEX);
+   Serial.print("  rxSize : "); Serial.println(co->CANmodule->rxSize);
+   Serial.print("  txSize : "); Serial.println(co->CANmodule->txSize);
+   Serial.print("  CANnormal : "); Serial.println(co->CANmodule->CANnormal);
+ }
+
+ /*Serial.print("SDO[0] présent : ");
+ Serial.println(co->SDO[0] ? "Oui" : "Non");
+
+ Serial.print("TPDO présent : ");
+ Serial.println(co->tpdo ? "Oui" : "Non");
+
+ Serial.print("RPDO présent : ");
+ Serial.println(co->rpdo ? "Oui" : "Non");*/
+
+ Serial.println("=======================");
 }
 
 void setup() {
@@ -96,11 +130,12 @@ void setup() {
   /* chargement du dictionnaire d'objets */
   CO_config_t* config_ptr = NULL;
   // --- Initialisation CANopenNode ---
-  CO_config_t config={0};
+  CO_config_t config;
+  memset(&config, 0, sizeof(config));
   OD_INIT_CONFIG(config);
+  //config.CNT_LSS_SLV = 1;
+  //config.CNT_RPDO = 1;
 
-  config.CNT_LSS_SLV = 1;
-  config.CNT_RPDO = 1;
   config_ptr = &config;
   /* fin dictionnaire objets */
 
@@ -110,25 +145,44 @@ void setup() {
       Création des objets CANopen
     --------------------------------------------*/
   /* allocation objets canopen */
+
+
+
+
   CO = CO_new(config_ptr, NULL);
   if (CO == NULL) {
     debug("Erreur d'allocation CO");
     while (1)
       ;
   }
+
+  dumpCO(CO);
+
+  //printf("CO: %p, CO->CANmodule: %p, rxSize: %d\n",
+   //(void*)CO,
+   //(void*)CO->CANmodule,
+   //CO->CANmodule ? CO->CANmodule->rxSize : -1);
+
+  printRxSize(CO->CANmodule, "Appel [printRxSize: CO->CANmodule] rx size: "); // 19, mauvaise adresse mais bonne taille rxArray
+
+  //printf("juste après CO_new CO->CANmodule: %p\n", (void*)CO->CANmodule); // mauvaise adresse
+
   /* fin allocation objets canopen */
 
 
   /*--------------------------------------------
       Mise en configuration du module CAN
     --------------------------------------------*/
-  CO->CANmodule->CANnormal = false;
-  CO_CANsetConfigurationMode((void *)&Can1); // rattachement du bus CAN à canopen
-  CO_CANmodule_disable(CO->CANmodule);       // désactivation du module CAN
+  //CO->CANmodule->CANnormal = false;
+  //printf("CO->CANmodule: %p\n", (void*)CO->CANmodule); // mauvaise adresse
+  //CO_CANsetConfigurationMode((void *)&Can1); // rattachement du bus CAN à canopen
+  //CO_CANmodule_disable(CO->CANmodule);       // désactivation du module CAN
 
   debug("après co_news");
 
+  printRxSize(CO->CANmodule, "Appel [printRxSize: CO->CANmodule] rx size: "); // 19, mauvaise adresse mais bonne taille rxArray
 
+  dumpCO(CO);
 
 
   /*--------------------------------------------
@@ -142,16 +196,24 @@ void setup() {
       ;
   }
 
+  //printf("CO: %p, CO->CANmodule: %p, rxSize: %d\n",
+   //(void*)CO,
+   //(void*)CO->CANmodule,
+   //CO->CANmodule ? CO->CANmodule->rxSize : -1);
+
+  printRxSize(CO->CANmodule, "Appel [printRxSize: CO->CANmodule] rx size: "); // 19, mauvaise adresse mais bonne taille rxArray
+
   debug("après init");
   print_delay(1000);
 
 
+  dumpCO(CO);
 
 
   /*--------------------------------------------
       Initialisation de LSS
     --------------------------------------------*/
-  CO_LSS_address_t lssAddress = { .identity = { .vendorID = OD_PERSIST_COMM.x1018_identity.vendor_ID,
+  /*CO_LSS_address_t lssAddress = { .identity = { .vendorID = OD_PERSIST_COMM.x1018_identity.vendor_ID,
                                                 .productCode = OD_PERSIST_COMM.x1018_identity.productCode,
                                                 .revisionNumber = OD_PERSIST_COMM.x1018_identity.revisionNumber,
                                                 .serialNumber = OD_PERSIST_COMM.x1018_identity.serialNumber } };
@@ -164,8 +226,15 @@ void setup() {
       ;
   }
 
+  //printf("CO: %p, CO->CANmodule: %p, rxSize: %d\n",
+   //(void*)CO,
+   //(void*)CO->CANmodule,
+   //CO->CANmodule ? CO->CANmodule->rxSize : -1);
+
+  printRxSize(CO->CANmodule, "Appel [printRxSize: CO->CANmodule] rx size: "); // 19, mauvaise adresse mais bonne taille rxArray
+
   debug("après LSSinit");
-  print_delay(2000);
+  print_delay(2000);*/
 
   /*--------------------------------------------
       Initialisation du protocole CANopen principal
@@ -173,8 +242,8 @@ void setup() {
   // Init objets CANopen (PDO, SDO, NMT, etc.)itRa
   err = CO_CANopenInit(
     CO,           // pointeur CO principal
-    NULL,         // NULL ici car OD_CNT_NMT == 1
-    NULL,         // NULL ici car OD_CNT_EM == 1 et co->em sera utilisé
+    CO->NMT,         // NULL ici car OD_CNT_NMT == 1
+    CO->em,         // NULL ici car OD_CNT_EM == 1 et co->em sera utilisé
     OD,           // OD global (déclaré dans OD.c)
     NULL,         // NULL ici si tu n’utilises pas de bits de statut spécifiques
     nmt_control,  // mode de contrôle, ex. : CO_NMT_STARTUP_TO_OPERATIONAL | CO_NMT_MANUAL_OPERATIONAL
@@ -185,6 +254,18 @@ void setup() {
     nodeId,         // nodeId
     &errInfo      // erreur détaillée en cas d’échec
   );
+
+  //printf("CO: %p, CO->CANmodule: %p, rxSize: %d\n",
+   //(void*)CO,
+   //(void*)CO->CANmodule,
+   //CO->CANmodule ? CO->CANmodule->rxSize : -1);
+
+  printRxSize(CO->CANmodule, "Appel [printRxSize: CO->CANmodule] rx size: "); // 19, mauvaise adresse mais bonne taille rxArray
+  dumpCO(CO);
+
+
+    //printRxSize(CO->CANmodule, "======================print rx size: "); // rxsize 3000+ et toujours mauvaise adresse
+
   if (err != CO_ERROR_NO) {
     debug("Erreur d'init CO_CANopenInit");
     while (1)
@@ -195,6 +276,7 @@ void setup() {
   print_delay(2000);
 
   //sendNMTstartNode(CO->CANmodule, nodeId); test
+
 
   print_delay(2000);
 
@@ -232,6 +314,8 @@ void setup() {
   // Passage en mode normal CAN
   CO->CANmodule->CANnormal = true;
   CO_CANsetNormalMode(CO->CANmodule);
+  //printf("CO->CANmodule: %p\n", (void*)CO->CANmodule);
+
 
 
   //Can1.begin();
@@ -247,7 +331,7 @@ void setup() {
   }
   /*err = CO_CANrxBufferInit(CO->CANmodule, 33, 0x180, 0x7FF, false, NULL, myRxCallback);
   if (err != CO_ERROR_NO) {
-      Serial.printf("Erreur initialisation buffer CAN RX : %d\n", err);
+      //Serial.printf("Erreur initialisation buffer CAN RX : %d\n", err);
   }*/
   debug("CANopenNode prêt");
 
@@ -255,12 +339,18 @@ void setup() {
 
   //Can1.setCallback(CAN1_RX0_IRQHandler);
 
-  print_delay(5000);
-}
+  //printRxSize(CO->CANmodule, "La rx size à la fin du setup");
+  //printf("CO->CANmodule: %p\n", (void*)CO->CANmodule);
 
+
+
+}
+/*
 void CAN1_RX0_IRQHandler(void){
   CO_CANinterruptRx(CO->CANmodule);
 }
+*/
+
 
 void loop() {
   static uint32_t lastTimeMain = 0;
@@ -275,17 +365,21 @@ void loop() {
     lastTimeMain = now;
 
     uint32_t timerNext_us = 0;
-    CO_NMT_reset_cmd_t reset = CO_process(CO, false, diffMain * 1000, &timerNext_us);
+    CO_NMT_reset_cmd_t reset = CO_process(CO, false, diffMain * 1000, &timerNext_us); // 19
+    printRxSize(CO->CANmodule, "print rx size dans co process: "); // 3000+
+
+
 
     // Traitement réception CAN brute (optionnel)
     if (Can1.read(msg)) {
+      //Serial.printf("La rx size dans l'appel de l'intterupt vaut %d", CO->CANmodule->rxSize);
       CO_CANinterruptRx(CO->CANmodule);  // OK ici message reçu
       messagePending = true;
-      Serial.println("Réception CAN brute :");
+      //Serial.println("Réception CAN brute :");
     }
 
     if (reset != CO_RESET_NOT) {
-      Serial.println("RESET demandé !");
+      //Serial.println("RESET demandé !");
       // Implémenter un redémarrage ou une réinit si besoin
     }
   }
@@ -312,10 +406,9 @@ void loop() {
     CO_process_RPDO(CO, syncWas, diff * 1000, &timerNext_us);
     CO_process_TPDO(CO, syncWas, diff * 1000, &timerNext_us);
 
-    // Ton code applicatif non-bloquant
     if (newMessage) {
       newMessage = false;
-      Serial.println("Nouveau message reçu.");
+      //Serial.println("Nouveau message reçu.");
     }
   }
   /*--------------------------------------------
@@ -329,6 +422,6 @@ void loop() {
   // -- Vérification du timer 5000ms --
   if (canopen_5000ms_tick == 5000) {
     canopen_5000ms_tick = 0;
-    Serial.println("Hardware Timer Alive ! (5000ms)");
+    //Serial.println("Hardware Timer Alive ! (5000ms)");
   }
 }

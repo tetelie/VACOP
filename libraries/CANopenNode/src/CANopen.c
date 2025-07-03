@@ -330,6 +330,8 @@ CO_t *CO_new(CO_config_t *config, uint32_t *heapMemoryUsed) {
     CO_t *coFinal = NULL;
     uint32_t mem = 0;
 
+
+
     /* For each object:
      * - allocate memory, verify allocation and calculate size of heap used
      * - if CO_MULTIPLE_OD is defined:
@@ -847,7 +849,7 @@ bool_t CO_isLSSslaveEnabled(CO_t *co) {
 /******************************************************************************/
 CO_ReturnError_t CO_CANinit(CO_t *co, void *CANptr, uint16_t bitRate) {
 
-  log_printf("Voic le petit baudratekcv,cxk,vkcx,vckv,: %d\n", bitRate);
+  //log_printf("Voic le petit baudratekcv,cxk,vkcx,vckv,: %d\n", bitRate);
 
     CO_ReturnError_t err;
 
@@ -855,6 +857,8 @@ CO_ReturnError_t CO_CANinit(CO_t *co, void *CANptr, uint16_t bitRate) {
 
     co->CANmodule->CANnormal = false;
     CO_CANsetConfigurationMode(CANptr);
+
+    log_printf("taille du rxsize est dans CO_CANinit %d\n", CO_GET_CO(CNT_ALL_RX_MSGS));
 
     /* CANmodule */
     err = CO_CANmodule_init(co->CANmodule,
@@ -864,6 +868,9 @@ CO_ReturnError_t CO_CANinit(CO_t *co, void *CANptr, uint16_t bitRate) {
                             co->CANtx,
                             CO_GET_CO(CNT_ALL_TX_MSGS),
                             bitRate);
+
+
+    log_printf("taille du rxsize A LA FIN CO_CANinit %d\n", CO_GET_CO(CNT_ALL_RX_MSGS));
 
     return err;
 }
@@ -1217,7 +1224,7 @@ CO_ReturnError_t CO_CANopenInitPDO(CO_t *co,
                                    uint32_t *errInfo)
 {
 
-    log_printf("INIT PDO \n");
+    //log_printf("INIT PDO \n");
     if (co == NULL) {
         return CO_ERROR_ILLEGAL_ARGUMENT;
     }
@@ -1243,7 +1250,7 @@ CO_ReturnError_t CO_CANopenInitPDO(CO_t *co,
                                 + nodeId + nodeIdOffset;
 #endif
             }
-            log_printf("avant CO_RPDO_init \n");
+            //log_printf("avant CO_RPDO_init \n");
             err = CO_RPDO_init(&co->RPDO[i],
                                od,
                                em,
@@ -1256,10 +1263,10 @@ CO_ReturnError_t CO_CANopenInitPDO(CO_t *co,
                                co->CANmodule,
                                CO_GET_CO(RX_IDX_RPDO) + i,
                                errInfo);
-            log_printf("après CO_RPDO_init \n");
+            //log_printf("après CO_RPDO_init \n");
 
             if (err) return err;
-            log_printf("YA PASDERREUR PEYIY \n");
+            //log_printf("YA PASDERREUR PEYIY \n");
 
         }
     }
@@ -1275,7 +1282,7 @@ CO_ReturnError_t CO_CANopenInitPDO(CO_t *co,
             if (i < CO_TPDO_DEFAULT_CANID_COUNT) {
 #if CO_TPDO_DEFAULT_CANID_COUNT <= 4
                 preDefinedCanId = (CO_CAN_ID_TPDO_1 + i * 0x100) + nodeId;
-                log_printf("%d \n",preDefinedCanId);
+                //log_printf("%d \n",preDefinedCanId);
 #else
                 uint16_t pdoOffset = i % 4;
                 uint16_t nodeIdOffset = i / 4;
@@ -1314,6 +1321,11 @@ CO_NMT_reset_cmd_t CO_process(CO_t *co,
     CO_NMT_internalState_t NMTstate = CO_NMT_getInternalState(co->NMT);
     bool_t NMTisPreOrOperational = (NMTstate == CO_NMT_PRE_OPERATIONAL
                                     || NMTstate == CO_NMT_OPERATIONAL);
+
+
+
+    log_printf("==========Adresse CANmodule: %p\n", (void*)co->CANmodule);
+
 
     /* CAN module */
     CO_CANmodule_process(co->CANmodule);

@@ -66,7 +66,6 @@ static CO_CANmodule_t* CANModule_local = NULL; /* Local instance of global CAN m
 #define FLAG_RTR   0x8000 /*!< RTR flag, part of identifier */
 
 
-
 /******************************************************************************/
 
 void CO_CANsetConfigurationMode(void* CANptr) {
@@ -100,15 +99,20 @@ CO_ReturnError_t CO_CANmodule_init(
   CO_CANtx_t txArray[],
   uint16_t txSize,
   uint16_t CANbitRate) {
-  log_printf("CO_CANmodule_init\n");
+  //log_printf("CO_CANmodule_init\n");
   if (!CANmodule || !rxArray || !txArray) return CO_ERROR_ILLEGAL_ARGUMENT;
-  log_printf("CO_CANmodule_init 2\n");
-  log_printf("Voic le petit baudrate: %d\n", CANbitRate);
+  //log_printf("CO_CANmodule_init 2\n");
+  //log_printf("Voic le petit baudrate: %d\n", CANbitRate);
+
+
+  log_printf("LA RX SIZE DANS CO CAN MODULE INIT EST: %d \n", rxSize);
+  //printRxSize(CAN, "LA RX SIZE DANS CO CAN MODULE INIT EST: ");
 
 
   CANmodule->CANptr = CANptr;
   CANmodule->rxArray = rxArray;
   CANmodule->rxSize = rxSize;
+
   CANmodule->txArray = txArray;
   CANmodule->txSize = txSize;
   CANmodule->CANnormal = false;
@@ -129,21 +133,27 @@ CO_ReturnError_t CO_CANmodule_init(
     txArray[i].bufferFull = false;
   }
 
+  printRxSize(CANmodule, "A LA FIN DE CO CAN MODULE INIT: ");
+
 
 
   STM32_CAN *can = static_cast<STM32_CAN *>(CANptr);
-  can->begin();             // ces appels DOIVENT afficher tes prints
-  log_printf("Voic le petit baudrate: %d\n", CANbitRate);
+  can->begin();
+  //log_printf("Voic le petit baudrate: %d\n", CANbitRate);
 
   can->setBaudRate(CANbitRate*1000);
 
-  log_printf("CO_CANmodule_init 3\n");
+  printRxSize(CANmodule, "A LA TOUTE FIN DE CO CAN MODULE INIT: ");
+
+
+  //log_printf("CO_CANmodule_init 3\n");
 
   return CO_ERROR_NO;
 }
 
 /******************************************************************************/
 void CO_CANmodule_disable(CO_CANmodule_t* CANmodule) {
+
     stm32_can_t* internalCAN = (stm32_can_t*)CANmodule->CANptr;
     if (CANmodule != NULL && CANmodule->CANptr != NULL) {
 #ifdef CO_STM32_FDCAN_Driver
@@ -158,16 +168,16 @@ void CO_CANmodule_disable(CO_CANmodule_t* CANmodule) {
 CO_ReturnError_t CO_CANrxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index, uint16_t ident, uint16_t mask, bool_t rtr, void *object,
                                     void (*CANrx_callback)(void *object, void *message)) {
 
-  //log_printf("CO_CANrxBufferInit\n");
+  ////log_printf("CO_CANrxBufferInit\n");
   CO_ReturnError_t ret = CO_ERROR_NO;
 
-  log_printf("Buffer enregistré : index = %d, ID = 0x%03X, mask = 0x%03X, cb = %p\n",
-              index, ident, mask, CANmodule->rxArray[index].CANrx_callback);
+  //log_printf("Buffer enregistré : index = %d, ID = 0x%03X, mask = 0x%03X, cb = %p\n",
+              //index, ident, mask, CANmodule->rxArray[index].CANrx_callback);
 
 
   if ((CANmodule != NULL) && (CANrx_callback != NULL) && (index < CANmodule->rxSize)) {
 
-    //log_printf("je suis rentrer dans la condition buffer init\n");
+    ////log_printf("je suis rentrer dans la condition buffer init\n");
     /* buffer, which will be configured */
     CO_CANrx_t *buffer = &CANmodule->rxArray[index];
 
@@ -175,7 +185,7 @@ CO_ReturnError_t CO_CANrxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index, u
     buffer->object = object;
 
     buffer->CANrx_callback = CANrx_callback;
-    log_printf("Callback assigné : index=%d, cb=%p\n", index, CANrx_callback);
+    //log_printf("Callback assigné : index=%d, cb=%p\n", index, CANrx_callback);
 
 
     /* CAN identifier and CAN mask, bit aligned with CAN module. Different on different microcontrollers. */
@@ -184,8 +194,10 @@ CO_ReturnError_t CO_CANrxBufferInit(CO_CANmodule_t *CANmodule, uint16_t index, u
          *
          * This is later used for RX operation match case
          */
-    buffer->ident = (ident & CANID_MASK) | (rtr ? FLAG_RTR : 0x00);
-    buffer->mask = (mask & CANID_MASK) | FLAG_RTR;
+    //buffer->ident = (ident & CANID_MASK) | (rtr ? FLAG_RTR : 0x00);
+    //log_printf("le can ID dans la fonction rxbufferinit est %x \n",buffer->ident);
+    //buffer->mask = (mask & CANID_MASK) | FLAG_RTR;
+    //log_printf("le mask dans la fonction rxbufferinit est 0x%03X \n",buffer->mask);
 
     /* Set CAN hardware module filter and mask. */
     if (CANmodule->useCANrxFilters) {
@@ -249,6 +261,17 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer) {
   return success ? CO_ERROR_NO : CO_ERROR_TX_OVERFLOW;
 }
 
+int getRxSize(CO_CANmodule_t* CANmodule)
+{
+  return CANmodule->rxSize;
+}
+
+void printRxSize(CO_CANmodule_t* CANmodule, char * message)
+{
+   log_printf("%s%d (CANmodule ptr: %p)\n", message, CANmodule->rxSize, (void*)CANmodule);
+}
+
+
 /******************************************************************************/
 void CO_CANclearPendingSyncPDOs(CO_CANmodule_t *CANmodule) /*pas modifiée*/
 {
@@ -290,6 +313,11 @@ static uint16_t rxErrors = 0, txErrors = 0, overflow = 0;
 void CO_CANmodule_process(CO_CANmodule_t* CANmodule) {
     uint32_t err = 0;
 
+    ////log_printf("la valeur du rxsize a l endroit du cocanmodule process  %d \n", CANmodule->rxSize);
+
+    printRxSize(CANmodule, "RxSize dans process: "); // 19
+
+    ////Serial.printf(CANmodule);
 
     stm32_can_t* internalCAN = (stm32_can_t*)(CANmodule->CANptr);
 
@@ -367,69 +395,72 @@ void CO_CANmodule_process(CO_CANmodule_t* CANmodule) {
 
 /******************************************************************************/
 void CO_CANinterruptRx(CO_CANmodule_t *CANmodule) {
-    log_printf("MESSAGE REÇU !\n");
+    //log_printf("MESSAGE REÇU !\n");
 
     if (!messagePending) {
-        log_printf("Pas de message en attente.\n");
+        //log_printf("Pas de message en attente.\n");
         return;
     }
 
-    log_printf("Début traitement message...\n");
+    //log_printf("Début traitement message...\n");
 
-    uint32_t ident = msg.id & 0x7FF;
+    uint32_t ident = msg.id;
     CO_CANrx_t *buffer = NULL;
     bool msgMatched = false;
 
-    log_printf("CAN ID reçu : 0x%03X\n", ident);
-    log_printf("Recherche d'un buffer correspondant dans rxArray (%d entrées)...\n", CANmodule->rxSize);
+    //log_printf("la taille rxsize est %d \n",CANmodule->rxSize );
+
+    //log_printf("CAN ID reçu : 0x%03X\n", ident);
+    //log_printf("Recherche d'un buffer correspondant dans rxArray (%d entrées)...\n", CANmodule->rxSize);
 
     for (uint16_t i = 0; i < CANmodule->rxSize; i++) {
         buffer = &CANmodule->rxArray[i];
-        log_printf(" - Index %d : ident = 0x%03X, mask = 0x%03X\n", i, buffer->ident, buffer->mask);
+        ////log_printf(" - Index %d : ident = 0x%03X, mask = 0x%03X\n", i, buffer->ident, buffer->mask);
 
-        if (((ident ^ buffer->ident) & buffer->mask) == 0U) {
-            log_printf("   -> Correspondance trouvée à l'index %d\n", i);
+        if ((((ident ^ buffer->ident) & buffer->mask) == 0U) && ((uintptr_t)(buffer->CANrx_callback) == 0x80011f1)) {
+            //log_printf("le buffer ident est %x\n",buffer->ident);
+            //log_printf("   -> Correspondance trouvée à l'index %d\n", i);
             msgMatched = true;
             break;
         }
     }
 
     if (!msgMatched) {
-        log_printf("Aucun buffer correspondant trouvé pour l'ID 0x%03X\n", ident);
+        //log_printf("Aucun buffer correspondant trouvé pour l'ID 0x%03X\n", ident);
     }
 
     if (msgMatched) {
         if (buffer == NULL) {
-            log_printf("ERREUR: Buffer est NULL malgré msgMatched = true !\n");
+            //log_printf("ERREUR: Buffer est NULL malgré msgMatched = true !\n");
         } else {
-            log_printf("Buffer trouvé : %p\n", (void*)buffer);
-            log_printf(" - Adresse du callback : %p\n", (void*)buffer->CANrx_callback);
-            log_printf(" - Objet : %p\n", buffer->object);
+            //log_printf("Buffer trouvé : %p\n", (void*)buffer);
+            //log_printf(" - Adresse du callback : %p\n", (void*)buffer->CANrx_callback);
+            //log_printf(" - Objet : %p\n", buffer->object);
 
             if (buffer->CANrx_callback == NULL) {
-                log_printf("ERREUR: Fonction de rappel CANrx_callback est NULL.\n");
+                //log_printf("ERREUR: Fonction de rappel CANrx_callback est NULL.\n");
             } else {
                 // Copier le message pour éviter d'éventuelles corruptions
                 CAN_message_t localMsg = msg;
 
-                log_printf("Callback address = %p\n", buffer->CANrx_callback);
+                //log_printf("Callback address = %p\n", buffer->CANrx_callback);
 
                 // Essayons de lire le code à cette adresse pour valider l'exécution
                 uint32_t *fn_ptr = (uint32_t*) buffer->CANrx_callback;
-                log_printf("Première instruction à l’adresse : 0x%08X\n", *fn_ptr);
+                //log_printf("Première instruction à l’adresse : 0x%08X\n", *fn_ptr);
 
-                log_printf("Appel de la fonction de rappel...\n");
+                //log_printf("Appel de la fonction de rappel...\n");
 
                 // Bloc try-catch n'existe pas en C, mais on entoure l'appel de logs
                 buffer->CANrx_callback(buffer->object, &localMsg);
 
-                log_printf("Fonction de rappel exécutée sans crash.\n");
+                //log_printf("Fonction de rappel exécutée sans crash.\n");
             }
         }
     }
 
     messagePending = false;
-    log_printf("Fin traitement message.\n\n");
+    //log_printf("Fin traitement message.\n\n");
 }
 
 
@@ -437,7 +468,7 @@ void CO_CANinterruptRx(CO_CANmodule_t *CANmodule) {
 // ---------------- SDO client helpers ----------------
 
 
-/*
+
 
 CO_SDO_abortCode_t read_SDO(CO_SDOclient_t *SDO_C, uint8_t nodeId, uint16_t index, uint8_t subIndex, uint8_t *buf, size_t bufSize, size_t *readSize) {
   CO_SDO_return_t ret;
@@ -477,5 +508,3 @@ CO_SDO_abortCode_t write_SDO(CO_SDOclient_t *SDO_C, uint8_t nodeId, uint16_t ind
 
   return abort;
 }
-
-*/

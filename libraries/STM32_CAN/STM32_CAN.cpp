@@ -330,38 +330,38 @@ void STM32_CAN::setAutoBusOffRecovery(bool enabled)
 // Init and start CAN
 void STM32_CAN::begin( bool retransmission ) {
 
-  log_printf("--- begin ---\n");
+  //log_printf("--- begin ---\n");
 
   // exit if CAN already is active
   if (_canIsActive) return;
 
-  log_printf("--- 2 ---\n");
+  //log_printf("--- 2 ---\n");
 
 
   auto instance = getPeripheral();
   if(instance == NP)
   {
-    log_printf("--- 3 ---\n");
+    //log_printf("--- 3 ---\n");
 
     //impossible pinconfig, done here
     return;
   }
   if(!allocatePeripheral(instance))
   {
-    log_printf("--- 4 ---\n");
+    //log_printf("--- 4 ---\n");
 
     //peripheral already in use
     return;
   }
 
-  log_printf("--- 5 ---\n");
+  //log_printf("--- 5 ---\n");
 
 
   _canIsActive = true;
 
   initializeBuffers();
 
-  log_printf("--- 6 ---\n");
+  //log_printf("--- 6 ---\n");
 
 
   /**
@@ -383,7 +383,7 @@ void STM32_CAN::begin( bool retransmission ) {
   // Configure CAN
   if (_can.handle.Instance == CAN1)
   {
-    log_printf("--- 7 ---\n");
+    //log_printf("--- 7 ---\n");
 
     //CAN1
     __HAL_RCC_CAN1_CLK_ENABLE();
@@ -451,10 +451,10 @@ void STM32_CAN::begin( bool retransmission ) {
   filtersInitialized = false;
 
   //try to start in case baudrate was set earlier
-  log_printf("try to start in case baudrate was set earlier\n");
+  //log_printf("try to start in case baudrate was set earlier\n");
   setBaudRate(baudrate);
 
-  log_printf("--- end begin ---\n");
+  //log_printf("--- end begin ---\n");
 
 
 
@@ -508,15 +508,15 @@ void STM32_CAN::end()
 void STM32_CAN::setBaudRate(uint32_t baud)
 {
 
-  log_printf("--- set baudrate ---\n");
-  log_printf("%d",baud);
+  //log_printf("--- set baudrate ---\n");
+  //log_printf("%d",baud);
 
   baudrate = baud;
 
   if(!hasPeripheral())
   {
 
-    log_printf("--- baud 1 ---\n");
+    //log_printf("--- baud 1 ---\n");
 
     return;
   }
@@ -524,7 +524,7 @@ void STM32_CAN::setBaudRate(uint32_t baud)
   // Calculate and set baudrate
   if(!calculateBaudrate( baud ))
   {
-    log_printf("--- baud 2 ---\n");
+    //log_printf("--- baud 2 ---\n");
     // connard il va là
     return;
   }
@@ -534,13 +534,13 @@ void STM32_CAN::setBaudRate(uint32_t baud)
   stop();
   start();
 
-  log_printf("--- STARTING  1 ---\n");
+  //log_printf("--- STARTING  1 ---\n");
 
 }
 
 void STM32_CAN::start()
 {
-  log_printf("== CAN start 1 == \n");
+  //log_printf("== CAN start 1 == \n");
 
   // Initializes CAN
   HAL_CAN_Init( &_can.handle );
@@ -558,7 +558,7 @@ void STM32_CAN::start()
   HAL_CAN_ActivateNotification( &_can.handle, CAN_IT_TX_MAILBOX_EMPTY);
   #endif
 
-  log_printf("== CAN start  end == \n");
+  //log_printf("== CAN start  end == \n");
 }
 
 void STM32_CAN::stop()
@@ -1156,19 +1156,19 @@ bool STM32_CAN::calculateBaudrate(int baud)
 
   baud = baud;
 
-  log_printf("calculate baud: %d\n", baud);
+  //log_printf("calculate baud: %d\n", baud);
 
   const uint32_t frequency = getCanPeripheralClock();
 
-  log_printf("fréquence: %d\n", frequency);
+  //log_printf("fréquence: %d\n", frequency);
 
 
   if (frequency == 48000000) {
     if (lookupBaudrate(baud, BAUD_RATE_TABLE_48M)) return true;
-    log_printf("48 MHz\n");
+    //log_printf("48 MHz\n");
   } else if (frequency == 45000000) {
     if (lookupBaudrate(baud, BAUD_RATE_TABLE_45M)) return true;
-    log_printf("45 MHz\n");
+    //log_printf("45 MHz\n");
 
   }
 
