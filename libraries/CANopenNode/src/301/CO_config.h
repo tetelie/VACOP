@@ -31,9 +31,6 @@
 extern "C" {
 #endif
 
-
-#define CO_MULTIPLE_OD
-
 /**
  * @defgroup CO_STACK_CONFIG Stack configuration
  * Stack configuration and enabling macros.
