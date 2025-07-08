@@ -19,3 +19,6 @@
 <p align="center">
   <img src="https://github.com/tetelie/canopen-stm32duino/blob/main/doc/board.png" alt="board" width="250"/>
 </p>
+
+
+le lien de l'autre dépôt : https://github.com/tetelie/VACOP/tree/ca2f457257df90a483ee7899222edcc64f7b016f#
