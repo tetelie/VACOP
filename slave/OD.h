@@ -11,19 +11,19 @@
 
     File info:
         File Names:   OD.h; OD.c
-        Project File: project.xdd
+        Project File: Slave_STM32.xdd
         File Version: 1
 
-        Created:      02/06/2025 14:05:44
-        Created By:   
-        Modified:     02/06/2025 14:08:23
+        Created:      04/06/2025 10:22:27
+        Created By:   Tina - Iban
+        Modified:     04/06/2025 14:07:30
         Modified By:  
 
     Device Info:
-        Vendor Name:  
-        Vendor ID:    
-        Product Name: Slave
-        Product ID:   
+        Vendor Name:  -
+        Vendor ID:    0
+        Product Name: Slave_STM32
+        Product ID:   0
 
         Description:  
 *******************************************************************************/
@@ -243,8 +243,8 @@ typedef struct {
         uint32_t COB_IDClientToServerRx;
         uint32_t COB_IDServerToClientTx;
     } x1200_SDOServerParameter;
-    uint8_t x2110_newObject_sub0;
-    uint32_t x2110_newObject[OD_CNT_ARR_2110];
+    uint8_t x2110_object_test_sub0;
+    uint32_t x2110_object_test[OD_CNT_ARR_2110];
 } OD_RAM_t;
 
 #ifndef OD_ATTR_PERSIST_COMM
@@ -338,7 +338,7 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1A01_TPDOMappingParameter &OD->list[30]
 #define OD_ENTRY_H1A02_TPDOMappingParameter &OD->list[31]
 #define OD_ENTRY_H1A03_TPDOMappingParameter &OD->list[32]
-#define OD_ENTRY_H2110_newObject &OD->list[33]
+#define OD_ENTRY_H2110_object_test &OD->list[33]
 
 
 /*******************************************************************************
